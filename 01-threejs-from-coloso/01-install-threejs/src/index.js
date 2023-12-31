@@ -32,6 +32,7 @@ function init() {
     function initRenderer($canvas) {
         renderer = new THREE.WebGLRenderer({
             canvas: $canvas,
+            antialias: true,
         });
 
         renderer.setSize(
@@ -42,12 +43,19 @@ function init() {
 
     // 3. Camera 인스턴스 생성
     function initCamera() {
-        camera = new THREE.PerspectiveCamera();
+        camera = new THREE.PerspectiveCamera(
+            45,
+            window.innerWidth / window.innerHeight
+        )
+        camera.position.set(0, 0, 10);
     }
 
     // 4. Light 인스턴스 생성
     function initLight() {
-        return new THREE.DirectionalLight();
+        const light = new THREE.DirectionalLight();
+        light.position.set(1, 1, 1);
+
+        return light;
     }
 
     // 5. Scene 인스턴스 생성
@@ -63,6 +71,10 @@ function init() {
     const light = initLight();
     initScene(light);
 
+    // 6. Sphere Mesh 생성
+    const sphere = createSphereMesh();
+    scene.add(sphere);
+
     // 7. 렌더링 시작
     render();
 }
@@ -74,3 +86,15 @@ function render() {
 }
 
 init();
+
+function createSphereMesh() {
+    const sphere_geometry = new THREE.SphereGeometry();
+    const material = new THREE.MeshPhongMaterial();
+
+    const sphere_mesh = new THREE.Mesh(
+        sphere_geometry,
+        material
+    );
+
+    return sphere_mesh;
+}
