@@ -1,0 +1,16 @@
+{
+  "name": "01-keyframe-animation-practice",
+  "version": "1.0.0",
+  "private": "true",
+  "scripts": {
+    "keyframe": "yarn workspace keyframe-extractor",
+    "my": "yarn workspace my-threejs"
+  },
+  "workspaces": {
+    "nohoist": [],
+    "packages": [
+      "packages/keyframe-extractor",
+      "packages/my-threejs"
+    ]
+  }
+}
