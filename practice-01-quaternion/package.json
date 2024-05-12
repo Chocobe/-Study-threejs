@@ -1,0 +1,16 @@
+{
+  "name": "practice-05-rotation",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "keyframe": "yarn workspace @miles/keyframe-extractor",
+    "miles": "yarn workspace @miles/my-three"
+  },
+  "workspaces": {
+    "nohoist": [],
+    "packages": [
+      "packages/keyframe-extractor",
+      "packages/my-three"
+    ]
+  }
+}
