@@ -1,0 +1,67 @@
+// import pretendard
+@import url("~pretendard/dist/web/variable/pretendardvariable.css");
+
+html,
+body {
+	background-color: #000;
+	overflow: hidden;
+	color: #fff;
+	font-family: "Pretendard", sans-serif;
+	background: url(/public/pattern.jpg) center center;
+	background-size: 30px;
+	* {
+		box-sizing: border-box;
+		margin: 0;
+	}
+
+	canvas {
+		display: block;
+	}
+
+	.container {
+		width: 100vw;
+		height: 100vh;
+
+		// flex middle center
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		align-content: center;
+		flex-wrap: wrap;
+
+		gap: 1em 1em;
+
+		.block {
+			background-color: #fff;
+			color: #000;
+			padding: 1em;
+			border-radius: 10px;
+			line-height: 1em;
+			font-weight: bold;
+
+			// flex center
+			display: flex;
+			justify-content: center;
+			align-items: center;
+
+			opacity: 0;
+			box-shadow: 0 0 10px #fff;
+
+			animation: intro 1s forwards cubic-bezier(0.075, 0.82, 0.165, 1);
+		}
+	}
+}
+
+@keyframes intro {
+	0% {
+		opacity: 0;
+		transform: scale(1.5);
+	}
+	30% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
