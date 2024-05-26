@@ -1,0 +1,211 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.7/dist/web/static/pretendard.css");
+html,
+body {
+	margin: 0;
+	overflow: hidden;
+	background: #000;
+	font-family: "Pretendard Variable", Pretendard, -apple-system,
+		BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI",
+		"Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji",
+		"Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+canvas {
+	display: block;
+}
+
+/* UI */
+.navigator {
+	display: flex;
+	justify-content: center;
+	width: 700px;
+	height: 80px;
+	background-color: #161616;
+	border-radius: 10px;
+	overflow: hidden;
+
+	position: fixed;
+	bottom: 90px;
+	left: 50%;
+	transform: translate(-50%, 0%);
+
+	box-shadow: 0 10px 15px rgba(0, 0, 0, 0.35);
+}
+.navigator > * {
+	flex: 1;
+}
+.navigator > .item:hover,
+.item.active {
+	color: #161616;
+	background: #d9cce8;
+}
+.container_right {
+	display: flex;
+	width: 200px;
+	flex: none;
+	justify-content: center;
+	align-items: center;
+	gap: 50px;
+}
+.item {
+	color: #d9cce8;
+	background: #161616;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+}
+.item svg {
+	width: 32px;
+	height: 32px;
+}
+.arrow {
+	flex: none;
+	color: #161616;
+	background: #d9cce8;
+	width: 80px;
+}
+.arrow.disabled {
+	background: #161616 !important;
+	color: #d9cce8 !important;
+	cursor: auto;
+}
+.arrow.disabled svg {
+	opacity: 0.4;
+}
+.divider {
+	flex: none;
+	width: 1px;
+	height: 32px;
+	background: #d9cce8;
+	align-self: center;
+}
+.page_tooltip {
+	opacity: 0;
+	pointer-events: none;
+
+	font-size: 18px;
+	display: flex;
+	gap: 12px;
+	height: auto;
+	padding: 18px 24px;
+	background-color: #d9cce8;
+	align-items: center;
+	border-radius: 10px;
+
+	position: fixed;
+	bottom: 200px;
+	left: 50%;
+	transform: translate(-50%, 0%);
+
+	transition: 0.3s;
+	text-transform: uppercase;
+}
+.page_tooltip.active {
+	opacity: 1;
+}
+.page_tooltip svg {
+	height: 24px;
+	width: 24px;
+}
+.page_tooltip p {
+	margin: 0;
+	height: auto;
+	line-height: 18px;
+}
+
+/* sound btn */
+.btn_sound .sound {
+	display: none;
+}
+.btn_sound.play .mute {
+	display: none;
+}
+.btn_sound.play .sound {
+	display: block;
+}
+
+/* title */
+.page_title {
+	color: #d9cce8;
+	position: fixed;
+	left: 60px;
+	top: 60px;
+	margin: 0;
+	line-height: 100%;
+	font-size: 42px;
+	pointer-events: none;
+	text-transform: uppercase;
+	user-select: none;
+	text-shadow: 0 10px 15px rgba(0, 0, 0, 0.35);
+}
+/* loading */
+.dimmer {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background: #000;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	transition: 0.3s;
+}
+
+.dimmer.end {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.loader {
+	width: 200px;
+	height: 8px;
+	border: 2px solid #d9cce8;
+}
+
+.progress {
+	width: 10%;
+	height: 100%;
+	background-color: #d9cce8;
+	transition: 0.3s;
+}
+
+@media screen and (max-width: 980px) {
+	.page_title {
+		left: 0;
+		width: 100%;
+		text-align: center;
+	}
+}
+
+@media screen and (max-width: 700px) {
+	.navigator {
+		width: calc(100% - 40px);
+		height: 50px;
+		border-radius: 8px;
+	}
+	.item svg {
+		width: 24px;
+		height: 24px;
+	}
+	.arrow {
+		width: 40px;
+	}
+	.container_right {
+		flex: 2;
+		gap: 0px;
+	}
+	.container_right > .item {
+		flex: 1;
+	}
+	.divider {
+		display: none;
+	}
+}
