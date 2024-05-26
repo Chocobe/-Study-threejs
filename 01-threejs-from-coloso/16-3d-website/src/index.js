@@ -52,19 +52,24 @@ controls.enableDamping = true;
 const scene1 = new Scene1(renderer, camera, controls);
 const scene2 = new Scene2(renderer, camera, controls);
 const scene3 = new Scene3(renderer, camera, controls);
-
-window.scenes = [
+const scenes = [
     scene1,
     scene2,
     scene3,
 ];
+window.scenes = scenes;
 
-let currentScene;
+let sceneIndex = 0;
 
 function sceneMove(pageNumber) {
+    const currentScene = scenes[sceneIndex] ?? scene1;
     currentScene?.stop();
-    currentScene = scenes[pageNumber - 1];
-    currentScene?.start();
+
+    sceneIndex = pageNumber - 1;
+    scenes[sceneIndex]?.start();
+
+    $title.textContent = scenes[sceneIndex]?.title ?? 'N/A';
+    $tooltipContent.textContent = scenes[sceneIndex]?.tooltip ?? 'N/A';
 }
 window.sceneMove = sceneMove;
 
@@ -77,10 +82,103 @@ function move(
 ) {
     gsap.to(target, {
         duration: 3,
-        ease: 'power3',
+        // ease: 'power3',
         x: position.x,
         y: position.y,
         z: position.z,
     });
+    console.log({
+        duration: 3,
+        // ease: 'power3',
+        x: position.x,
+        y: position.y,
+        z: position.z,
+    })
+    console.log('target: ', target);
 }
 window.move = move;
+
+// FIXME: Navigator 개발 후, 지우기
+setTimeout(() => {
+    // window.scenes[2].start();
+    sceneMove(1);
+}, 1_000);
+
+//
+// button interaction
+//
+const $title = document.querySelector('.title');
+const $tooltipContent = document.querySelector('#tooltip-content');
+
+const $arrowLeft = document.querySelector('#arrow-left');
+$arrowLeft.addEventListener('click', () => {
+    console.log('onClick() - sceneIndex: ', sceneIndex);
+    if (sceneIndex < 1) {
+        return;
+    }
+
+    sceneMove(sceneIndex);
+});
+
+const $arrowRight = document.querySelector('#arrow-right');
+$arrowRight.addEventListener('click', () => {
+    if (sceneIndex >= scenes.length - 1) {
+        return;
+    }
+
+    sceneMove(sceneIndex + 2);
+});
+
+const $play = document.querySelector('#play');
+$play.addEventListener('click', () => {
+    $play.classList.add('play');
+    $rocket.classList.remove('play');
+    $star.classList.remove('play');
+
+    sceneMove(1);
+});
+
+const $rocket = document.querySelector('#rocket');
+$rocket.addEventListener('click', () => {
+    $play.classList.remove('play');
+    $rocket.classList.add('play');
+    $star.classList.remove('play');
+
+    sceneMove(2);
+});
+
+const $star = document.querySelector('#star');
+$star.addEventListener('click', () => {
+    $play.classList.remove('play');
+    $rocket.classList.remove('play');
+    $star.classList.add('play');
+
+    sceneMove(3);
+});
+
+let isMute = true;
+const $volume = document.querySelector('#volume');
+const $soundIcon = $volume.querySelector('.sound');
+const $muteIcon = $volume.querySelector('.mute');
+const $audio = $volume.querySelector('.audio');
+$volume.addEventListener('click', () => {
+    isMute = !isMute;
+
+    if (isMute) {
+        $volume.classList.remove('active');
+        $soundIcon.classList.remove('active');
+        $muteIcon.classList.add('active');
+    } else {
+        $volume.classList.add('active');
+        $soundIcon.classList.add('active');
+        $muteIcon.classList.remove('active');
+    }
+
+    $audio.muted = isMute;
+});
+
+const $question = document.querySelector('#question');
+const $tooltip = document.querySelector('#tooltip');
+$question.addEventListener('click', () => {
+    $tooltip.classList.toggle('active');
+});

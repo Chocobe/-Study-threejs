@@ -245,6 +245,9 @@ function render() {
 export class Scene3 {
 	constructor(renderer_, camera_, controls_) {
 		this.backgroundColor = '#080042';
+        this.title = 'Space';
+		this.tooltip = 'Click and customize stars with toolbar';
+
 		renderer = renderer_;
 		camera = camera_;
 		controls = controls_;

@@ -77,6 +77,9 @@ function render() {
 export class Scene1 {
 	constructor(renderer_, camera_, controls_) {
 		this.backgroundColorr = 'hsl(255,70%,40%)';
+		this.title = 'Icon Land';
+		this.tooltip = 'Click the play button';
+
 		renderer = renderer_;
 		camera = camera_;
 		controls = controls_;

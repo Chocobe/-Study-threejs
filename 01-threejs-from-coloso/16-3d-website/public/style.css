@@ -1,14 +1,152 @@
-html,
-body {
-	margin: 0;
-	overflow: hidden;
-	background: #000;
+:root {
+	--color: #161616;
+	--foreground-color: #D9CCE8;
 }
 
 * {
 	box-sizing: border-box;
 }
 
+html,
+body {
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background: #000;
+}
+
 canvas {
 	display: block;
+}
+
+/* title */
+.title {
+	margin: 0;
+
+	position: fixed;
+	top: 60px;
+	left: 60px;
+
+	color: var(--foreground-color);
+	line-height: 100%;
+	font-size: 42px;
+
+	pointer-events: none;
+}
+
+/* Navigator */
+.navigator {
+	height: 40px;
+
+	display: flex;
+	align-items: center;
+	gap: 0;
+
+	position: fixed;
+	bottom: 16px;
+	left: 50%;
+	transform: translateX(-50%);
+
+	border-radius: 10px;
+}
+
+.navigator .button {
+	height: 100%;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	border: none;
+
+	transition: all 0.18s ease;
+}
+.navigator .button:hover {
+	filter: brightness(1.2);
+}
+.navigator .button:active {
+	filter: brightness(0.8);
+}
+
+.navigator .arrowButton {
+	width: 40px;
+	height: 100%;
+
+	color: var(--color);
+	background-color: var(--foreground-color);
+	overflow: hidden;
+}
+.navigator .arrowButton.left {
+	border-radius: 10px 0 0 10px;
+}
+.navigator .arrowButton.right {
+	border-radius: 0 10px 10px 0;
+}
+
+.navigator .actionButton {
+	width: 60px;
+	height: 100%;
+
+	color: var(--foreground-color);
+	background-color: var(--color);
+}
+
+.navigator .actionButton.play {
+	color: var(--color);
+	background-color: var(--foreground-color);
+}
+
+.navigator .divider {
+	width: 1px;
+	height: 16px;
+	margin: auto 0;
+
+	background-color: var(--foreground-color);
+}
+
+.navigator .volume {
+	background-color: var(--color);
+}
+.navigator .volume.active {
+	background-color: var(--foreground-color);
+}
+.navigator .volume .sound {
+	display: none;
+	color: var(--color);
+}
+.navigator .volume .sound.active {
+	display: block;
+}
+.navigator .volume .mute {
+	display: none;
+	color: var(--foreground-color);
+}
+.navigator .volume .mute.active {
+	display: block;
+}
+
+.navigator .tooltip {
+	padding: 18px 24px;
+	width: max-content;
+
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	position: absolute;
+	bottom: calc(100% + 16px);
+	left: 50%;
+	transform: translateX(-50%);
+
+	color: #000;
+	font-size: 18px;
+
+	border-radius: 10px;
+	background-color: var(--foreground-color);
+	opacity: 0;
+	pointer-events: none;
+}
+.navigator .tooltip.active {
+	opacity: 1;
+	pointer-events: all;
 }

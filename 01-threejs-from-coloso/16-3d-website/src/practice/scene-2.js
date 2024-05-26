@@ -155,6 +155,9 @@ function render() {
 export class Scene2 {
 	constructor(renderer_, camera_, controls_) {
 		this.backgroundColorr = 'hsl(255,70%,40%)';
+		this.title = 'My Workspace';
+		this.tooltip = 'Click the color pallete';
+
 		renderer = renderer_;
 		camera = camera_;
 		controls = controls_;
