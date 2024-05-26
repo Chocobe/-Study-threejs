@@ -190,6 +190,7 @@ function init() {
         initAnimation(gltf);
         // initPostProcessing();
         initParticle();
+        loading();
     });
 }
 

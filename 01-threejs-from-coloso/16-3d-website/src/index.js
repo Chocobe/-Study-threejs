@@ -80,29 +80,46 @@ function move(
     target, 
     position = new Vector3(0, 0, 0)
 ) {
+    controls.enabled = false;
+
     gsap.to(target, {
         duration: 3,
         // ease: 'power3',
         x: position.x,
         y: position.y,
         z: position.z,
+        onComplete() {
+            controls.enabled = true;
+        },
     });
-    console.log({
-        duration: 3,
-        // ease: 'power3',
-        x: position.x,
-        y: position.y,
-        z: position.z,
-    })
-    console.log('target: ', target);
 }
 window.move = move;
 
+//
+// loading
+//
+const $dimmer = document.querySelector('.dimmer');
+const $progress = document.querySelector('.progress');
+let loadingProgress = 0;
+
+function loading() {
+    loadingProgress += 1;
+    $progress.style.width = (loadingProgress / 3) * 100 + '%';
+
+    if (loadingProgress >= 3) {
+        sceneMove(1);
+        setTimeout(() => {
+            $dimmer.classList.add('end');
+        }, 1_000);
+    }
+}
+window.loading = loading;
+
 // FIXME: Navigator 개발 후, 지우기
-setTimeout(() => {
-    // window.scenes[2].start();
-    sceneMove(1);
-}, 1_000);
+// setTimeout(() => {
+//     // window.scenes[2].start();
+//     sceneMove(1);
+// }, 1_000);
 
 //
 // button interaction

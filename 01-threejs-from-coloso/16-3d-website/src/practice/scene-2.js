@@ -126,6 +126,8 @@ function init() {
 			}
 		});
 
+		loading();
+
 		function playAnimation(name) {
 			const clip = gltf.animations.find((animation) => {
 				return animation.name === name;
