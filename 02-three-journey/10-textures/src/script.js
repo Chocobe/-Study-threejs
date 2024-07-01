@@ -49,18 +49,18 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
  * => 다양한 모델, 폰트, 텍스쳐를 로딩할 때 발생하는 많은 이벤트를 관리할 수 있다.
  */
 const loadingManager = new THREE.LoadingManager();
-loadingManager.onStart = () => {
-    console.log('onStart()');
-};
-loadingManager.onLoad = () => {
-    console.log('onLoad()');
-};
-loadingManager.onProgress = () => {
-    console.log('onProgress()');
-};
-loadingManager.onError = () => {
-    console.log('onError()');
-};
+// loadingManager.onStart = () => {
+//     console.log('onStart()');
+// };
+// loadingManager.onLoad = () => {
+//     console.log('onLoad()');
+// };
+// loadingManager.onProgress = () => {
+//     console.log('onProgress()');
+// };
+// loadingManager.onError = () => {
+//     console.log('onError()');
+// };
 
 const textureLoader = new THREE.TextureLoader(loadingManager);
 const colorTexture = textureLoader.load('/textures/door/color.jpg', texture => {
@@ -86,6 +86,57 @@ const roughnessTexture = textureLoader.load('/textures/door/roughness.jpg', text
 });
 
 /**
+ * `Texture.repeat`
+ * => `UV coordinator` 에서 축 방향으로 반복할 횟수를 지정한다.
+ */
+// colorTexture.repeat.x = 2;
+// colorTexture.repeat.y = 3;
+
+/**
+ * `Texture.wrapS`, `Texture.wrapT`
+ * => 반복 방식을 설정한다.
+ */
+/**
+ * `THREE.RepeatWrapping`
+ * `Texture.repeat.축` 에 설정한 횟수만큼 반복해서 렌더링한다.
+ */
+// colorTexture.wrapS = THREE.RepeatWrapping;
+// colorTexture.wrapT = THREE.RepeatWrapping;
+
+/**
+ * `THREE.MirroredRepeatWrapping`
+ * => 데칼코마니 처럼 [원본, 반전, 원본, 반전, ...] 패턴으로 반복해서 렌더링한다.
+ */
+// colorTexture.wrapS = THREE.MirroredRepeatWrapping;
+// colorTexture.wrapT = THREE.MirroredRepeatWrapping;
+
+/**
+ * `Texture.offset.축`
+ * => 설정한 값만큼 Texture 의 렌더링 시작점을 옮긴다.
+ */
+// colorTexture.offset.x = 0.5;
+// colorTexture.offset.y = 0.5;
+
+/**
+ * `Texture.rotation`
+ * => Texture를 회전시켜서 렌더링한다.
+ * => `UV coordinator`의 원점(0, 0)은 좌측 하단 점이다.
+ * => 그러므로 좌측 하단의 원전(0, 0)에서 지정한 각도(radian) 만큼 회전한다. 
+ */
+colorTexture.rotation = Math.PI / 4;
+
+/**
+ * `Texture.center.축`
+ * => Texture 의 `transform(변형)`의 원점을 지정한다.
+ * => 지정하지 않으면, 위 주석과 같이 원점(0, 0)이 기본값이다.
+ * 
+ * => 아래의 (0.5, 0.5) 설정은, `Geometry`의 크기가 `width: 1`, `height: 1` 이기 때문에, 중심점 좌표값을 지정한 것이다.
+ */
+colorTexture.center.x = 0.5;
+colorTexture.center.y = 0.5;
+
+
+/**
  * Base
  */
 // Canvas
@@ -98,6 +149,8 @@ const scene = new THREE.Scene()
  * Object
  */
 const geometry = new THREE.BoxGeometry(1, 1, 1)
+// `UV coordinator`는 `Geometry` 에 `Texture` 를 어떻게 입힐지에 대한 좌표 등의 데이터를 가진다.
+// console.log('geometry.attributes.uv: ', geometry.attributes.uv);
 const material = new THREE.MeshBasicMaterial({
     map: colorTexture,
 });
