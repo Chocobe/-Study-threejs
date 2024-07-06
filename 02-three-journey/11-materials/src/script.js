@@ -1,5 +1,12 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import GUI from 'lil-gui';
+
+/**
+ * Debug
+ */
+const gui = new GUI();
 
 /**
  * Base
@@ -13,14 +20,27 @@ const scene = new THREE.Scene()
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-scene.add(ambientLight);
+// const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+// scene.add(ambientLight);
 
-const pointLight = new THREE.PointLight(0xffffff, 30);
-pointLight.position.x = 2;
-pointLight.position.y = 3;
-pointLight.position.z = 4;
-scene.add(pointLight);
+// const pointLight = new THREE.PointLight(0xffffff, 30);
+// pointLight.position.x = 2;
+// pointLight.position.y = 3;
+// pointLight.position.z = 4;
+// scene.add(pointLight);
+
+/**
+ * Environment map
+ */
+const rgbeLoader = new RGBELoader();
+rgbeLoader.load('textures/environmentMap/2k.hdr', environmentMap => {
+    console.log('environmentMap: ', environmentMap);
+
+    environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+
+    scene.background = environmentMap;
+    scene.environment = environmentMap;
+});
 
 /**
  * Texture
@@ -139,7 +159,134 @@ function initMeshLambertMaterial() {
 
     return material;
 }
-const material = initMeshLambertMaterial();
+// const material = initMeshLambertMaterial();
+
+/**
+ * MeshPhongMaterial
+ * 
+ * `MeshLambertMaterial` 보다 좀 더 사실적으로 렌더링된다.
+ * 
+ * `MeshPhongMaterial` 도 `Light`에 영향을 받고, 빛 반사를 표현한다.
+ */
+function initMeshPhongMaterial() {
+    const material = new THREE.MeshPhongMaterial();
+    material.shininess = 100;
+    material.specular = new THREE.Color('#1188ff');
+
+    return material;
+}
+// const material = initMeshPhongMaterial();
+
+/**
+ * MeshToonMaterial
+ * 
+ * 만화 같은 렌더링
+ * 
+ * 만약 `마인크레프트` 같이 pixel 들의 색상에 그라데이션 없이 표현하고자 한다면, 아래와 같이 설정하면 된다.
+ * => `gradientTexture.minFilter = THREE.NearestFilter;`
+ * => `gradientTexture.magFilter = THREE.NearestFilter`
+ * 
+ * 이렇게 `minFilter` 와 `magFilter` 를 `THREE.NearestFilter` 로 설정했다면,
+ * => `Texture.generateMipmaps` 설정을 `false` 로 추가 설정해주면 렌더링 성능을 향상시킬 수 있다.
+ * =>
+ * => `minFilter` 와 `magFilter` 를 `THREE.NearestFilter` 로 설정하는 순간, 
+ * => `Mipmapping(1x1이 될 때까지 1/2 크기의 이미지를 생성하는 GPU동작)`이 사용되지 않기 때문이다.
+ */
+function initMeshToonMaterial() {
+    const material = new THREE.MeshToonMaterial();
+
+    gradientTexture.minFilter = THREE.NearestFilter;
+    gradientTexture.magFilter = THREE.NearestFilter;
+    gradientTexture.generateMipmaps = false;
+    material.gradientMap = gradientTexture;
+
+    return material;
+}
+// const material = initMeshToonMaterial();
+
+/**
+ * MeshStandardMaterial
+ * 
+ * `PBR(Physically Based Rendering)` 원칙을 사용하는 Material 이다.
+ * => `metalness`, `roughness`와 같은 속성을 사용할 수 있다.
+ * 
+ * `Blender` 와 같은 `3D Software` 들이 사용하는 표준 Material 이므로,
+ * => `Three.js` 뿐만 아니라 `Blender`, `C4D` 와 같은 소프트웨어와 유사함을 가진다.
+ */
+function initMeshStandardMaterial() {
+    const material = new THREE.MeshStandardMaterial();
+    // material.metalness = 0.7;
+    material.metalness = 1;
+
+    // material.roughness = 0.2;
+    material.roughness = 1;
+
+    material.map = doorColorTexture;
+
+    // `aoMap`: Ambient Occlusion Map
+    // => `aoMap` 에 설정한 `Texture` 는 `Ambient Light` 이외의 `Light` 에는 영향을 받지 않는다.
+    // => 때문에, `scene.environment` 에 설정한 `HRD` 가 `aoMap`에는 영향을 주지 않는다.
+    //
+    // => 결과적으로 `doorAmbientOcclusionTexture` 이미지에서 검은 색에 가까운 테두리 부분이 진하게 렌더링된다.
+    material.aoMap = doorAmbientOcclusionTexture;
+    material.aoMapIntensity = 1;
+
+    // `displacementMap`
+    // => `Texture`의 밝은 부분은 좌표 고도가 높아지고
+    // => 어두운 부분은 좌표 고도가 낮아진다.
+    // => 결과적으로 `Texture`에 의해, `Mesh`가 변형된다.
+    // 
+    // `displacementMap` === `heightMap` 같은 용어다.
+    //
+    // => `Mesh`를 변형하기 때문에,
+    // => `Geometry`에 충분히 많은 `subdivision`이 있어야 한다.
+    // material.displacementMap = doorHeightTexture;
+    // material.displacementScale = 1;
+
+    // `metalnessMap`
+    // => `Texture`의 밝은 부분은 금속 느낌으로 렌더링하고,
+    // => 어두운 부분은 고무 느낌으로 렌더링 한다.
+    //
+    // 만약 `MeshStandardMaterial.metalness`에 `1`이 아닌 다른 값이 함께 사용되었다면,
+    // => `곱 연산`이 되면서 이상한 결과를 보게 된다.
+    material.metalnessMap = doorMetalnessTexture;
+
+    // `roughnessMap`
+    // => `Texture`의 밝은 부분은 부드러운 표면으로 렌더링하고,
+    // => 어두운 부분은 거칠게 렌더링한다.
+    //
+    // 만약 `MeshStandardMaterial.roughness`에 `1`이 아닌 다른 값이 함께 사용되었다면,
+    // => `곱 연산`이 되면서 이상한 결과를 보게 된다.
+    material.roughnessMap = doorRoughnessTexture;
+
+    // `normalMap`
+    // => `displacementMap(=== heightMap)`처럼,
+    // => `Texture`의 밝은 부분은 튀어나오고,
+    // => 어두운 부분은 움푹 파인 느낌을 렌더링한다.
+    //
+    // `displacementMap`과 차이점은
+    // => `Geometry`의 좌표를 변형하지 않고,
+    // => 입체감을 표현한다는 것이다.
+    material.normalMap = doorNormalTexture;
+    // material.normalScale.set(1, 1);
+    material.normalScale.set(0.5, 0.5);
+
+    // `alphaMap`
+    // => `Texture`의 밝은 부분은 `map`에 설정한 원본 `Texture`를 렌더링하고,
+    // => 어두운 부분은 투명하게 렌더링한다.
+    //
+    // `material.transparent = true` 설정이 있어야 투명효과가 렌더링된다.
+    material.alphaMap = doorAlphaTexture;
+    material.transparent = true;
+
+    gui.add(material, 'metalness').min(0).max(1).step(0.0001);
+    gui.add(material, 'roughness').min(0).max(1).step(0.0001);
+
+    return material;
+}
+const material = initMeshStandardMaterial();
+
+
 
 
 
