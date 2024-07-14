@@ -1,6 +1,44 @@
+/**
+ * 그림자 연출을 위한 테크닉 3가지
+ * 
+ * 1. Light객체의 `castShadow`를 사용하여, `shadowMap`을 사용하는 방법
+ * => `MeshStandardMaterial` 사용
+ * => 연산량이 많으므로, 퍼포먼스 이슈에 취약하다.
+ * 
+ * 2. `Baking`한 `Texture`를 사용하는 방법
+ * => `MeshBasicMaterial` 사용
+ * => 그림자가 드리워질 `Mesh`의 `Material.map`에 `Texture`를 적용하는 방법
+ * => 고정된 `Mesh`에서는 문제없지만, `Mesh`가 움직일 때 그림자는 그대로 고정되기 때문에 이상한 결과가 만들어진다.
+ * 
+ * 3. `Baking`한 `Texture`를 **그림자를 담당하는 Mesh(Material)에 적용** 하는 방법
+ * => `MeshBasicMaterial` 사용
+ * => 그림자가 드리워질 `Mesh`의 표면(매우 근접한 위치)에 새로운 `Mesh`를 만들고, `Baking` Texture`를 적용한다.
+ * => 그리고 그림자를 생성하는 `Mesh`가 움직일 때, `Baking`을 담당하는 `Mesh`를 함께 움직여주면, `Baking`을 사용한 실시간 그림자가 만들어진다.
+ * 
+ * `3번 방법`이 성능 퍼포먼스에도 좋고, 실시간 그림자 연출도 가능하므로, 좋은 방법이 된다.
+ */
+
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
+
+/**
+ * Texture
+ * => Baking한 이미지를 그림자로 사용하기
+ */
+const textureLoader = new THREE.TextureLoader();
+/**
+ * 그림자 연출 `2번 방법`을 위한 `Texture`
+ */
+const bakedShadow = textureLoader.load('/textures/bakedShadow.jpg');
+bakedShadow.colorSpace = THREE.SRGBColorSpace;
+/**
+ * 그림자 연출 `3번 방법`을 위한 `Texture`
+ */
+const simpleShadow = textureLoader.load('/textures/simpleShadow.jpg');
+// simpleShadow.colorSpace = THREE.SRGBColorSpace;
+
+console.log('bakedShadow: ', bakedShadow);
 
 /**
  * Base
@@ -130,11 +168,35 @@ sphere.castShadow = true;
 
 const plane = new THREE.Mesh(
     new THREE.PlaneGeometry(5, 5),
+    /**
+     * `Baking` 이미지를 그림자 `Texture`로 사용할 것이므로,
+     * => `MeshStandardMaterial`은 필요 없다.
+     * => `MeshBasicMaterial`이면 충분하다!
+     */
     material
+    // new THREE.MeshBasicMaterial({
+    //     map: bakedShadow,
+    // })
 )
 plane.rotation.x = - Math.PI * 0.5
 plane.position.y = - 0.5
 plane.receiveShadow = true;
+
+/**
+ * 그림자 연출 `3번 방법`을 위한 `Plane`
+ */
+const sphereShadow = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.5, 1.5),
+    new THREE.MeshBasicMaterial({
+        // color: 0xff0000,
+        color: 0x000000,
+        alphaMap: simpleShadow,
+        transparent: true,
+    })
+);
+sphereShadow.rotation.x = -Math.PI / 2;
+sphereShadow.position.y = plane.position.y + 0.01;
+scene.add(sphereShadow);
 
 scene.add(sphere, plane)
 
@@ -184,7 +246,8 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-renderer.shadowMap.enabled = true;
+// renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = false;
 /**
  * `WebGLRenderer.shadowMap.type`을 `THREE.PCFSoftShadowMap`으로 설정하면,
  * => `조명.shadow.radius`가 적용되지 않기 때문에 `Blur`효과를 사용할 수 없다.
@@ -203,6 +266,16 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    // Update sphere
+    sphere.position.x = Math.cos(elapsedTime) * 1.5;
+    sphere.position.z = Math.sin(elapsedTime) * 1.5;
+    sphere.position.y = Math.abs(Math.sin(elapsedTime * 3));
+
+    // Update shadow (`sphere`의 `position`에 따라 그림자 연출하기)
+    sphereShadow.position.x = sphere.position.x;
+    sphereShadow.position.z = sphere.position.z;
+    sphereShadow.material.opacity = (1 - sphere.position.y) * 0.4;
 
     // Update controls
     controls.update()
