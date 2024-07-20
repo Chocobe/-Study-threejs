@@ -134,8 +134,8 @@ floorMaterialGUI.add(floor.material, 'displacementBias').min(-1).max(1).step(0.0
 const house = new THREE.Group();
 scene.add(house);
 
-// Walls
-const walls = new THREE.Mesh(
+// `Wall`
+const wall = new THREE.Mesh(
     new THREE.BoxGeometry(4, 2.5, 4),
     new THREE.MeshStandardMaterial({
         map: wallColorTexture,
@@ -145,8 +145,8 @@ const walls = new THREE.Mesh(
         normalMap: wallNormalTexture,
     })
 );
-walls.position.y += 2.5 / 2;
-house.add(walls);
+wall.position.y += 2.5 / 2;
+house.add(wall);
 
 // Roof
 const roof = new THREE.Mesh(
@@ -330,6 +330,63 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+/**
+ * Shadows
+ */
+renderer.shadowMap.enabled = true;
+// PCF: Percentage-Closer Filtering
+// => 그림자를 생성할 때 생기는 `aliasing (계단 현상)`을 부드럽게 보정해주는 방식을 말한다.
+//
+// `aliasing`은 `다른 이름` or `가명` 이라는 뜻을 가지는데,
+// => `신호 처리 및 데이터 샘플링` 이론에서 유래된 용어다.
+// => 고주파 신호를 디지털화 하기위해 샘플링 작업을 하는데, 이 주파수의 `최고 주파수 * 2` 속도로 샘플링해야 복원이 된다.
+// => 이보다 느린 속도로 샘플링하게 되면, `왜곡된 신호`가 만들어지며 이를 `aliasing` 이라고 한다.
+//
+// 컴퓨터 그래픽스에서 `aliasing`은 `왜곡된 신호` 처럼 `왜곡 현상` or `계단 현상` 을 말한다.
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+// Cast and receive
+directionalLight.castShadow = true;
+ghost1.castShadow = true;
+ghost2.castShadow = true;
+ghost3.castShadow = true;
+
+wall.castShadow = true;
+wall.receiveShadow = true;
+roof.castShadow = true;
+floor.receiveShadow = true;
+
+for (const grave of graves.children) {
+    grave.castShadow = true;
+    grave.receiveShadow = true;
+}
+
+// Mapping
+// const directionalLightShadowCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
+// scene.add(directionalLightShadowCameraHelper);
+
+directionalLight.shadow.mapSize.width = 256;
+directionalLight.shadow.mapSize.height = 256;
+directionalLight.shadow.camera.top = 8;
+directionalLight.shadow.camera.right = 8;
+directionalLight.shadow.camera.bottom = -8;
+directionalLight.shadow.camera.left = -8;
+directionalLight.shadow.camera.near = 1;
+directionalLight.shadow.camera.far = 20;
+
+ghost1.shadow.mapSize.width = 256;
+ghost1.shadow.mapSize.height = 256;
+ghost1.shadow.camera.near = 1;
+ghost1.shadow.camera.far = 10;
+
+ghost2.shadow.mapSize.width = 256;
+ghost2.shadow.mapSize.height = 256;
+ghost2.shadow.camera.far = 10;
+
+ghost3.shadow.mapSize.width = 256;
+ghost3.shadow.mapSize.height = 256;
+ghost3.shadow.camera.far = 10;
 
 /**
  * Animate
