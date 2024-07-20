@@ -405,6 +405,22 @@ sky.material.uniforms.mieDirectionalG.value = 0.95;
 sky.material.uniforms.sunPosition.value.set(0.3, -0.038, -0.95);
 
 /**
+ * Fog
+ * => Three.js 에서 제공하는 빌트인 Fog 는 2가지가 있다.
+ * => `class Fog`, `class FoxExp2`
+ * 
+ * `Fog`
+ * => 비교적 비현실적인 안개
+ * 
+ * `FogExp2`
+ * => 비교적 현실적인 한개
+ * 
+ * 안개의 `color`는 배경색과 동일하게 적용하면, 자연스럽게 연출할 수 있다.
+ */
+// scene.fog = new THREE.Fog('#22343f', 1, 13);
+scene.fog = new THREE.FogExp2('#22343f', 0.1);
+
+/**
  * Animate
  */
 const timer = new Timer()
