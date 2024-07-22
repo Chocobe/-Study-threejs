@@ -38,7 +38,7 @@ const particleTexture = textureLoader.load('/textures/particles/2.png');
 
 // Bruno 선생님이 만든 `particleGeometry`
 const particleGeometry = new THREE.BufferGeometry();
-const count = 5_000;
+const count = 20_000;
 const positions = new Float32Array(count * 3);
 
 for (let i = 0; i < count * 3; i++) {
@@ -87,19 +87,18 @@ particleMaterial.alphaMap = particleTexture;
  */
 particleMaterial.depthWrite = false;
 
-// particleMaterial.transparent = true;
-// particleMaterial.blending = THREE.AdditiveBlending;
-// particleMaterial.depthWrite = false;
+/**
+ * `blending: THREE.additiveBlending`
+ * => particle이 겹치는 부분은 color를 섞어서 표현하게 된다.
+ * => 단순히 color가 아니라, color조명이 섞이는 방식이 되며, 결과적으로 중첩될수록 **흰색** 이 된다.
+ * 
+ * 더 화려한 연출이 되지만, 사용자 기기의 성능을 비교적 많이 사용하게 된다.
+ */
+particleMaterial.blending = THREE.AdditiveBlending;
 
 // Points
 const particles = new THREE.Points(particleGeometry, particleMaterial);
 scene.add(particles);
-
-const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(),
-    new THREE.MeshBasicMaterial()
-);
-scene.add(cube);
 
 /**
  * Sizes
