@@ -170,6 +170,21 @@ const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
 
+    // Update particles
+    // particles.rotation.y = elapsedTime * 0.2;
+    /**
+     * 아래와 같이 `for()`문으로 particle animation을 구현하는 것은 안좋은 방법이다.
+     * => 차후 배우게 될 `Custom Shader`를 사용하는 것이 좋은 방법이다.
+     */
+    for (let i = 0; i < count; i++) {
+        const i3 = i * 3;
+        const x = particleGeometry.attributes.position.array[i3]; 
+
+        particleGeometry.attributes.position.array[i3 + 1] = Math.sin(elapsedTime + x);
+    }
+
+    particleGeometry.attributes.position.needsUpdate = true;
+
     // Update controls
     controls.update()
 
