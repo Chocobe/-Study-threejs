@@ -38,16 +38,24 @@ const particleTexture = textureLoader.load('/textures/particles/2.png');
 
 // Bruno 선생님이 만든 `particleGeometry`
 const particleGeometry = new THREE.BufferGeometry();
+
 const count = 20_000;
 const positions = new Float32Array(count * 3);
+const colors = new Float32Array(count * 3);
 
 for (let i = 0; i < count * 3; i++) {
     positions[i] = (Math.random() - 0.5) * 10;
+    colors[i] = Math.random();
 }
 
 particleGeometry.setAttribute(
     'position',
     new THREE.BufferAttribute(positions, 3)
+);
+
+particleGeometry.setAttribute(
+    'color',
+    new THREE.BufferAttribute(colors, 3)
 );
 
 // Material
@@ -59,6 +67,15 @@ particleMaterial.sizeAttenuation = true;
 // particleMaterial.map = particleTexture;
 particleMaterial.transparent = true;
 particleMaterial.alphaMap = particleTexture;
+
+/**
+ * `PointsMaterial.vertexColors`
+ * => particle 각각의 color를 적용하기 위해 필요한 설정
+ * 
+ * `BufferGeometry`의 `setAttribute`로 설정한 `color`가 각각의 particle에 적용 된다.
+ * => `PointMaterial.color`와 혼합된 색상이 렌더링된다.
+ */
+particleMaterial.vertexColors = true;
 
 /**
  * 방법 1) `PNG` 이미지를 사용하여, particle 배경을 투명하게 하기
