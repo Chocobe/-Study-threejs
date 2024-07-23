@@ -6,7 +6,9 @@ import GUI from 'lil-gui'
  * Base
  */
 // Debug
-const gui = new GUI()
+const gui = new GUI({
+    width: 360,
+});
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -21,11 +23,33 @@ const parameters = {};
 parameters.count = 1_000;
 parameters.size = 0.02;
 
+/** @type { THREE.BufferGeometry } */
+let geometry = null;
+/** @type { THREE.PointsMaterial } */
+let material = null;
+/** @type { THREE.Points } */
+let points = null;
+
 const generateGalaxy = () => {
+    /**
+     * Destroy old galaxy
+     * 
+     * `Geometry`와 `Material`은 Memory에 할당하여 사용하게 된다.
+     * => 사용하지 않는 경우, `dispse()` 메소드로 `메모리 해제`를 해주어야 `memory leak (메모리 누수)`를 막을 수 있다.
+     * 
+     * `Points`는 `Geometry`와 `Material`을 조합하는 역할을 하며, 별도의 메모리 관리가 필요없다.
+     * => 그러므로, `scene.remove(points)`를 사용하여 `scene`에서 제거만 해주면 된다.
+     */
+    if (points !== null) {
+        geometry.dispose();
+        material.dispose();
+        scene.remove(points);
+    }
+
     /**
      * Geometry
      */
-    const geometry = new THREE.BufferGeometry();
+    geometry = new THREE.BufferGeometry();
 
     const positions = new Float32Array(parameters.count * 3);
 
@@ -45,7 +69,7 @@ const generateGalaxy = () => {
     /**
      * Material
      */
-    const material = new THREE.PointsMaterial({
+    material = new THREE.PointsMaterial({
         size: parameters.size,
         sizeAttenuation: true,
         depthWrite: false,
@@ -55,34 +79,19 @@ const generateGalaxy = () => {
     /**
      * Points
      */
-    const points = new THREE.Points(geometry, material);
+    points = new THREE.Points(geometry, material);
     scene.add(points);
 }
-// const generateGalaxy = () => {
-//     const positions = new Float32Array(parameters.count * 3);
 
-//     for (let i = 0; i < parameters.count; i++) {
-//         const i3 = i * 3;
-
-//         positions[i3] = (Math.random() * 2 - 1) * 3;
-//         positions[i3 + 1] = (Math.random() * 2 - 1) * 3;
-//         positions[i3 + 2] = (Math.random() * 2 - 1) * 3;
-//     }
-
-//     const geometry = new THREE.BufferGeometry();
-//     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-//     const material = new THREE.PointsMaterial({
-//         size: 0.01,
-//         sizeAttenuation: true,
-//         depthWrite: false,
-//         blending: THREE.AdditiveBlending,
-//     });
-
-//     const particles = new THREE.Points(geometry, material);
-//     scene.add(particles);
-// };
 generateGalaxy();
+
+/**
+ * GUi를 사용한 `debug` 기능 추가는 사용할 변수가 생길때 마다 추가해주자
+ * => 원하는 설정값을 찾기 좋다.
+ * => 나중에 몰아서 하려고 하면, 지루한 작업 시간이 되고 빼먹는 실수를 할 수 있다.
+ */
+gui.add(parameters, 'count').min(100).max(1_000_000).step(100).onFinishChange(generateGalaxy);
+gui.add(parameters, 'size').min(0.001).max(0.1).step(0.001).onFinishChange(generateGalaxy);
 
 /**
  * Sizes
