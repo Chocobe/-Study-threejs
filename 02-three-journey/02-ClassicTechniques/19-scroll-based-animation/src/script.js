@@ -12,6 +12,9 @@ const parameters = {
 
 gui
     .addColor(parameters, 'materialColor')
+    .onChange(() => {
+        material.color.set(parameters.materialColor);
+    });
 
 /**
  * Base
@@ -25,9 +28,16 @@ const scene = new THREE.Scene()
 /**
  * Objects
  */
+// Texture
+const textureLoader = new THREE.TextureLoader();
+const gradientTexture = textureLoader.load('textures/gradients/3.jpg');
+gradientTexture.minFilter = THREE.NearestFilter;
+gradientTexture.magFilter = THREE.NearestFilter;
+
 // Material
 const material = new THREE.MeshToonMaterial({
     color: parameters.materialColor,
+    gradientMap: gradientTexture,
 });
 
 // Meshes
