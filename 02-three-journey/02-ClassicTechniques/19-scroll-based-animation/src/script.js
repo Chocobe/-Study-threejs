@@ -41,6 +41,8 @@ const material = new THREE.MeshToonMaterial({
 });
 
 // Meshes
+// TODO: 3으로 수정해보자
+const objectsDistance = 4;
 const mesh1 = new THREE.Mesh(
     new THREE.TorusGeometry(1, 0.4, 16, 60),
     material
@@ -56,7 +58,17 @@ const mesh3 = new THREE.Mesh(
     material
 );
 
+mesh1.position.y = -objectsDistance * 0;
+mesh2.position.y = -objectsDistance * 1;
+mesh3.position.y = -objectsDistance * 2;
+
+mesh1.position.x = 2;
+mesh2.position.x = -2;
+mesh3.position.x = 2;
+
 scene.add(mesh1, mesh2, mesh3);
+
+const sectionMeshs = [mesh1, mesh2, mesh3];
 
 /**
  * Lights
@@ -93,9 +105,12 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
+const cameraGroup = new THREE.Group();
+scene.add(cameraGroup);
+
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 100)
 camera.position.z = 6
-scene.add(camera)
+cameraGroup.add(camera);
 
 /**
  * Renderer
@@ -108,6 +123,33 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
+ * Scroll
+ */
+let scrollY = window.scrollY;
+
+window.addEventListener('scroll', () => {
+    scrollY = window.scrollY;
+    console.log('scrollY: ', scrollY);
+});
+
+/**
+ * Cursor
+ */
+const cursor = {};
+cursor.x = 0;
+cursor.y = 0;
+
+window.addEventListener('mousemove', e => {
+    const {
+        clientX,
+        clientY,
+    } = e;
+
+    cursor.x = clientX / sizes.width - 0.5;
+    cursor.y = clientY / sizes.height - 0.5;
+})
+
+/**
  * Animate
  */
 const clock = new THREE.Clock()
@@ -115,6 +157,21 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    // Animate camera
+    camera.position.y = -scrollY / sizes.height * objectsDistance;
+
+    const parallaxX = cursor.x;
+    const parallaxY = -cursor.y;
+
+    cameraGroup.position.x = parallaxX;
+    cameraGroup.position.y = parallaxY;
+
+    // Animate Meshs
+    for (const mesh of sectionMeshs) {
+        mesh.rotation.x = elapsedTime * 0.1;
+        mesh.rotation.y = elapsedTime * 0.12;
+    }
 
     // Render
     renderer.render(scene, camera)
