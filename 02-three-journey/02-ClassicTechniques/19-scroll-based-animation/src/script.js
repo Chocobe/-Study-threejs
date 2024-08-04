@@ -31,7 +31,7 @@ const scene = new THREE.Scene()
 // Texture
 const textureLoader = new THREE.TextureLoader();
 const gradientTexture = textureLoader.load('textures/gradients/3.jpg');
-gradientTexture.minFilter = THREE.NearestFilter;
+// gradientTexture.minFilter = THREE.NearestFilter;
 gradientTexture.magFilter = THREE.NearestFilter;
 
 // Material
@@ -66,9 +66,9 @@ mesh1.position.x = 2;
 mesh2.position.x = -2;
 mesh3.position.x = 2;
 
-scene.add(mesh1, mesh2, mesh3);
-
 const sectionMeshs = [mesh1, mesh2, mesh3];
+
+scene.add(...sectionMeshs);
 
 /**
  * Lights
@@ -153,19 +153,22 @@ window.addEventListener('mousemove', e => {
  * Animate
  */
 const clock = new THREE.Clock()
+let previousTime = 0;
 
 const tick = () =>
 {
-    const elapsedTime = clock.getElapsedTime()
+    const elapsedTime = clock.getElapsedTime();
+    const deltaTime = elapsedTime - previousTime;
+    previousTime = elapsedTime;
 
     // Animate camera
     camera.position.y = -scrollY / sizes.height * objectsDistance;
 
-    const parallaxX = cursor.x;
-    const parallaxY = -cursor.y;
+    const parallaxX = cursor.x * 0.5;
+    const parallaxY = -cursor.y * 0.5;
 
-    cameraGroup.position.x = parallaxX;
-    cameraGroup.position.y = parallaxY;
+    cameraGroup.position.x += (parallaxX - cameraGroup.position.x) * 5 * deltaTime;
+    cameraGroup.position.y += (parallaxY - cameraGroup.position.y) * 5 * deltaTime;
 
     // Animate Meshs
     for (const mesh of sectionMeshs) {
