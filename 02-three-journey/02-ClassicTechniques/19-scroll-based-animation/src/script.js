@@ -14,6 +14,7 @@ gui
     .addColor(parameters, 'materialColor')
     .onChange(() => {
         material.color.set(parameters.materialColor);
+        particlesMaterial.color.set(parameters.materialColor);
     });
 
 /**
@@ -41,7 +42,6 @@ const material = new THREE.MeshToonMaterial({
 });
 
 // Meshes
-// TODO: 3으로 수정해보자
 const objectsDistance = 4;
 const mesh1 = new THREE.Mesh(
     new THREE.TorusGeometry(1, 0.4, 16, 60),
@@ -69,6 +69,36 @@ mesh3.position.x = 2;
 const sectionMeshs = [mesh1, mesh2, mesh3];
 
 scene.add(...sectionMeshs);
+
+/**
+ * Particles
+ */
+// Geometry
+const particlesCount = 200;
+const positions = new Float32Array(particlesCount * 3);
+
+for (let i = 0; i < particlesCount; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 10;
+    positions[i * 3 + 1] = objectsDistance * 0.5 - (Math.random() * objectsDistance * sectionMeshs.length);
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+}
+
+const particlesGeometry = new THREE.BufferGeometry();
+particlesGeometry.setAttribute('position', new THREE.BufferAttribute(
+    positions,
+    3
+));
+
+// Material
+const particlesMaterial = new THREE.PointsMaterial({
+    color: parameters.materialColor,
+    sizeAttenuation: true,
+    size: 0.03,
+});
+
+// Points
+const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+scene.add(particles);
 
 /**
  * Lights
