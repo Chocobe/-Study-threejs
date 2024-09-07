@@ -21,6 +21,21 @@ debugObject.createSphere = () => {
 };
 gui.add(debugObject, 'createSphere');
 
+debugObject.createBox = () => {
+    const width = (Math.random() - 0.5) * 3;
+    const height = (Math.random() - 0.5) * 3;
+    const depth = (Math.random() - 0.5) * 3;
+
+    const position = {
+        x: (Math.random() - 0.5) * 3,
+        y: 3,
+        z: (Math.random() - 0.5) * 3,
+    };
+
+    createBox(width, height, depth, position);
+}
+gui.add(debugObject, 'createBox');
+
 /**
  * Base
  */
@@ -158,8 +173,14 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 /**
  * Util
+ * @type {Array<{
+ *      mesh: THREE.Mesh
+ *      body: CANNON.Body
+ * }>}
  */
 const objectsToUpdate = [];
+
+// Sphere
 // sphere 의 크기를 담당하는 radius 는 `단위값(1)` 로 생성한 후,
 // `createSphere()` 에서 `Mesh`를 생성할 때, `scale`에 `radius` 를 적용하면, 동일한 크기의 `Sphere` 를 생성할 수 있다.
 // => 그리고 `createSphere()` 의 `radius` 인자를 적용하여 생성할 수 있게 된다.
@@ -207,6 +228,44 @@ createSphere(0.5, {
     z: 0,
 });
 
+// Box
+const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
+const boxMaterial = new THREE.MeshStandardMaterial({
+    metalness: 0.3,
+    roughness: 0.4,
+    envMap: environmentMapTexture,
+});
+
+const createBox = (width, height, depth, position) => {
+    // Three.js Mesh
+    const mesh = new THREE.Mesh(
+        boxGeometry,
+        boxMaterial
+    );
+    mesh.scale.set(width, height, depth);
+    mesh.position.copy(position);
+    scene.add(mesh);
+
+    // Cannon.js Body
+    const shape = new CANNON.Box(new CANNON.Vec3(
+        width * 0.5,
+        height * 0.5,
+        depth * 0.5
+    ));
+    const body = new CANNON.Body({
+        mass: 1,
+        shape,
+        material: defaultContactMaterial,
+    });
+    body.position.copy(position);
+    world.addBody(body);
+
+    objectsToUpdate.push({
+        mesh,
+        body,
+    });
+}
+
 /**
  * Animate
  */
@@ -229,6 +288,7 @@ const tick = () =>
         } = object;
 
         mesh.position.copy(body.position);
+        mesh.quaternion.copy(body.quaternion);
     });
 
     // Update controls
