@@ -65,6 +65,13 @@ const environmentMapTexture = cubeTextureLoader.load([
  */
 // World
 const world = new CANNON.World();
+// 충돌 감지 알고리즘 설정 (Cannon.js)
+// => 기본값은 `CANNON.NaiveBroadphase`
+world.broadphase = new CANNON.SAPBroadphase(world);
+// 더이상 움직이지도, 영향을 받지도 않는 객체는 `sleep`이 되도록 허용하는 설정
+// => 움직이거나, 다른 물체와 충돌하지 않는 한, `sleep` 이 되고, 충돌 감지 연산의 성능을 높일 수 있다.
+// => 기본값은 `false` 이므로, 꼭 설정하자
+world.allowSleep = true;
 world.gravity.set(0, -9.82, 0);
 
 // Material
