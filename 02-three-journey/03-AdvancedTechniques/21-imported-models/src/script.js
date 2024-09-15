@@ -3,6 +3,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {
     GLTFLoader,
 } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {
+    DRACOLoader,
+} from 'three/examples/jsm/loaders/DRACOLoader.js';
 import GUI from 'lil-gui'
 
 /**
@@ -18,7 +21,7 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 /**
- * Models
+ * GLTF Models
  * 
  * `GLTFLoader`로 불러올 수 있는 파일 포맷 3가지
  * * => `GLTF`, `GLTF Binary`, `GLTF Embedded`
@@ -47,14 +50,45 @@ const gltfLoader = new GLTFLoader();
 // )
 
 /** FlightHelmet */
-gltfLoader.load(
-    '/models/FlightHelmet/glTF/FlightHelmet.gltf',
-    gltf => {
-        const children = [...gltf.scene.children];
+// gltfLoader.load(
+//     '/models/FlightHelmet/glTF/FlightHelmet.gltf',
+//     gltf => {
+//         const children = [...gltf.scene.children];
 
-        for (const child of children) {
-            scene.add(child);
-        }
+//         for (const child of children) {
+//             scene.add(child);
+//         }
+//     }
+// )
+
+/**
+ * DRACO Models
+ * 
+ * * `GLTF`처럼 3D Model 파일 확장자다.
+ * * `GLTF` 파일보다 2배 이상 가볍다.
+ * * `DRACOLoader`는 `WebAssembly`로 구현되어 있기 때문이다.
+ * 
+ * * Model이 `kb` 단위의 크기라면, 굳이 사용할 필요 없지만,
+ * * `mb` 단위의 큰 Model 일 때 사용하자.
+ * 
+ * `node_modeuls` 의 `three` 에 있는 `draco` 폴더를 사용하여, DRACOLoader 의 worker를 사용한다.
+ * * 체감이 될 정도로 로딩 속도가 빠르다.
+ * * DRACOLoader 를 GLTFLoader에 설정해주면, GLTFLoader 가 DRACOLoader 를 사용하여 로딩하게 된다.
+ * * => 만약, 불러올 파일이 `DRACO` 가 아닌 `GLTF` 형식이라면, 내부에서 DRACOLoader를 사용하지 않고, 원래의 GLTFLoader 방식으로 Model을 불러온다.
+ * 
+ * `GLTFLoader.setDecoderPath()` 를 사용하여 `DRACO` decoder 를 설정할 수 있는데,
+ * * 경로에 `Trailing Slash` 를 잊지 말자.
+ */
+const dracoLoader = new DRACOLoader();
+// 아래와 같이 `Trailing Slash` 가 없으면, DRACOLoader가 동작하지 않아서, Model이 렌더링되지 않는다.
+// dracoLoader.setDecoderPath('/draco');
+dracoLoader.setDecoderPath('/draco/');
+
+gltfLoader.setDRACOLoader(dracoLoader);
+gltfLoader.load(
+    '/models/Duck/glTF-Draco/Duck.gltf',
+    gltf => {
+        scene.add(gltf.scene);
     }
 )
 
