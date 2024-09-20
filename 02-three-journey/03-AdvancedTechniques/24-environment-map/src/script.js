@@ -69,11 +69,20 @@ gui.add(scene.environmentRotation, 'y').min(0).max(Math.PI * 2).step(0.001).name
 // => `RGBELoader`를 사용하여 `HDR` 파일을 `DataTexture`로 불러올 수 있다.
 // => `LDR`보다 풍부한 `발기` 데이터를 가지고 있어서, `CubeTextureLoader`보다 밝고 선명하게 렌더링 된다.
 // => `HDR`를 사용한다면, `scene.backgroundIntensity` 나 `scene.environmentIntensity`를 굳이 사용하지 않아도 된다.
-rgbeLoader.load('/environmentMaps/0/2k.hdr', environmentMap => {
-    console.log('environmentMap: ', environmentMap);
+// rgbeLoader.load('/environmentMaps/0/2k.hdr', environmentMap => {
+//     console.log('environmentMap: ', environmentMap);
 
+//     environmentMap.mapping = THREE.EquirectangularReflectionMapping;
+//     scene.background = environmentMap;
+//     scene.environment = environmentMap;
+// });
+
+// Blneder로 만든 HDR 사용하기
+rgbeLoader.load('/environmentMaps/blender-2k.hdr', environmentMap => {
     environmentMap.mapping = THREE.EquirectangularReflectionMapping;
-    scene.background = environmentMap;
+
+    // 배경으로 렌더링은 하지 않고, `scene.environment` 에만 적용해서, Light 효과만 사용하기
+    // scene.background = environmentMap;
     scene.environment = environmentMap;
 });
 
