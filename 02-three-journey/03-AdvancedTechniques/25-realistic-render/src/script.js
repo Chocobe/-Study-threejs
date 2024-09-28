@@ -111,7 +111,10 @@ controls.enableDamping = true
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas
+    canvas: canvas,
+    // `antialias`는 Mesh들의 경계에 생기는 `계단효과(stair-like)`를 완화해준다.
+    // => 만약 `pixelRatio` 가 `2이상` 이라면, 의미가 없어지므로, 성능만 더 사용하게 된다.
+    antialias: window.devicePixelratio < 2,
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
