@@ -1,8 +1,19 @@
 import Sizes from './Utils/Sizes';
 import Time from './Utils/Time';
+import Camera from './Camera';
+import * as THREE from 'three';
+import Renderer from './Renderer';
+
+let instance = null;
 
 export default class Experience {
   constructor(canvas) {
+    if (instance) {
+      return instance;
+    }
+
+    instance = this;
+
     // Global access
     window.experience = this;
 
@@ -12,6 +23,9 @@ export default class Experience {
     // Setup
     this.sizes = new Sizes();
     this.time = new Time();
+    this.scene = new THREE.Scene();
+    this.camera = new Camera();
+    this.renderer = new Renderer();
 
     // Sizes resize event
     this.sizes.on('resize', () => {
@@ -21,14 +35,17 @@ export default class Experience {
     // Time tick event
     this.time.on('tick', () => {
       this.update();
-    })
+    });
   }
 
+  // `resize` 이벤트를 사용하는 모든 동작은 여기서 통합하여 실행하기
   resize() {
-    // console.log('A resize occured - this: ', this);
+    this.camera.resize();
+    this.renderer.resize();
   }
 
   update() {
-    // console.log('update');
+    this.camera.update();
+    this.renderer.update();
   }
 }
