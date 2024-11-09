@@ -7,8 +7,6 @@ export default class Floor {
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
 
-    console.log('Created Floor');
-
     this.setGeometry();
     this.setTextures();
     this.setMaterial();
@@ -44,11 +42,8 @@ export default class Floor {
   setMesh() {
     this.mesh = new THREE.Mesh(this.geometry, this.material);
     this.mesh.quaternion.setFromAxisAngle(new THREE.Vector3(-1, 0, 0), Math.PI * 0.5);
-    this.mesh.position.y = -1.5;
     this.mesh.receiveShadow = true;
 
     this.scene.add(this.mesh);
-
-    console.log('this.mesh', this.mesh);
   }
 }
